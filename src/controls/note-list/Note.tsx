@@ -30,17 +30,22 @@ export interface NoteData {
 }
 
 interface Props {
-    note: NoteData
+    note: NoteData,
+    onChange: (prevPath:NoteData[], nextPath:NoteData[])=>void
 }
 
-export const Note = (props: Props):React.ReactNode => {
+interface ReactDelegate<Props> {
+    (props:Props):React.ReactElement<Props>
+}
+
+export const Note:ReactDelegate<Props> = props => {
     return (
         <div style={Styles.control}>
             <IconButton
                 iconClassName="material-icons"
-                tooltip={"Ligature"}
+                tooltip={props.note.isExpanded ? "Collapse" : "Expand"}
                 >
-                expand-more
+                {props.note.isExpanded ? "expand-less" : "expand-more"}
             </IconButton>
             <span style={Styles.dragHandle}
                 />
@@ -48,13 +53,16 @@ export const Note = (props: Props):React.ReactNode => {
                 hintText="Message Field"
                 floatingLabelText="MultiLine and FloatingLabel"
                 multiLine={true}
-                rows={2}
+                rows={1}
+                value={props.note.text}
+                onChange={}
                 />
             <div style={Styles.childrenContainer}>
                 {props.note.children.map((childNote, index) =>
                     <Note
                         key={index}
                         note={childNote}
+                        onChange={props.onChange}
                         />
                 )}
             </div>
