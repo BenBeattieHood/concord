@@ -1,22 +1,27 @@
 import * as React from 'react';
 import { Search } from './controls/search/Search';
 import { BookBrowser } from './controls/book-browser/BookBrowser';
-import { CitationList } from './controls/citation-list/CitationList';
+import { NoteList } from './controls/note-list/NoteList';
 
 namespace Styles {
     export const page:React.CSSProperties = {
         height: "100vh",
         width: "100vw",
         scroll: "auto",
-        display: "flex"
+        display: "flex",
+        flexDirection: "column"
     }
     export const searchContainer:React.CSSProperties = {
-        width: "100%"
+    }
+    export const workspaceContainer:React.CSSProperties = {
+        display: "flex",
+        flexWrap: "wrap",
+        flex: 1
     }
     export const mainContainer:React.CSSProperties = {
         flex: 1
     }
-    export const citationListContainer:React.CSSProperties = {
+    export const noteListContainer:React.CSSProperties = {
         flex: 1
     }
 }
@@ -29,13 +34,15 @@ export class App extends React.Component {
                     <Search
                         />
                 </div>
-                <div style={Styles.mainContainer}>
-                    <BookBrowser
-                        />
-                </div>
-                <div style={Styles.citationListContainer}>
-                    <CitationList
-                        />
+                <div style={Styles.workspaceContainer}>
+                    <div style={Styles.mainContainer}>
+                        <BookBrowser
+                            />
+                    </div>
+                    <div style={Styles.noteListContainer}>
+                        <NoteList
+                            />
+                    </div>
                 </div>
             </div>
         );
