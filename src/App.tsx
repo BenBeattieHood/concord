@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Search } from './controls/search/Search';
 import { BookBrowser } from './controls/book-browser/BookBrowser';
-import { NoteList } from './controls/note-list/NoteList';
+import { NotesEditor } from './controls/notes/NotesEditor';
 
 namespace Styles {
     export const page:React.CSSProperties = {
@@ -40,7 +40,8 @@ export class App extends React.Component {
                             />
                     </div>
                     <div style={Styles.noteListContainer}>
-                        <NoteList
+                        <NotesEditor
+                            onSelectionChanged=(selection)
                             />
                     </div>
                 </div>
