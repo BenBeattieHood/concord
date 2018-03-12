@@ -16,7 +16,9 @@ namespace Styles {
 export class BookBrowser extends React.Component {
     render() {
         return (
-            <div style={Styles.control}/>
+            <div style={Styles.control}>
+                
+            </div>
         );
     }
 }
