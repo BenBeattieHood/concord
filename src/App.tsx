@@ -41,7 +41,9 @@ export class App extends React.Component {
                     </div>
                     <div style={Styles.noteListContainer}>
                         <NotesEditor
-                            onSelectionChanged=(selection)
+                            onSelectionChanged={selection => {
+                                
+                            }}
                             />
                     </div>
                 </div>

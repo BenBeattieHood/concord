@@ -8,6 +8,10 @@ namespace Styles {
         paddingRight: 50,
         paddingBottom: 10,
         display: "flex",
+        flex: 1
+    }
+    export const editor:React.CSSProperties = {
+        flex: 1
     }
 }
 
