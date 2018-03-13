@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as MaterialUiStyles from 'material-ui/styles';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
 
 //const muiTheme = MaterialUiStyles.getMuiTheme();
 namespace Styles {
@@ -17,28 +18,67 @@ namespace Styles {
         flex: 1
     }
     export const searchResults:React.CSSProperties = {
-        display: "none",
-        width: "100%",
+        position: "absolute",
+        left: 0,
+        right: 0,
+        padding: "0 5px",
         maxHeight: "calc(100vh - 10px - 10px)",
-        overflowY: "auto"
+        overflowY: "auto",
+        bottom: 0
     }
 }
 
-export class Search extends React.Component {
+interface Props {
+    resultsVisible: boolean,
+    onResultsVisibityChanged: (value:boolean) => void; 
+}
+
+interface State {
+    searchTempText: string
+}
+
+const combineStyles = (styles:(React.CSSProperties | undefined)[]):React.CSSProperties | undefined =>
+    styles.reduce(
+        (prev, next) => next ? ({
+            ...prev,
+            ...next
+        }) : prev
+    )
+
+export class Search extends React.Component<Props, State> {
+
+    constructor(props:Props) {
+        super(props);
+        this.state = {
+            searchTempText: ""
+        }
+    }
+    
+    onSearchKeyPress = (key: string, value: string) => {
+        this.setState({searchTempText: value});
+        this.props.onResultsVisibityChanged(!!value);
+    }
+
     render() {
         return (
             <div style={Styles.control}>
-                <TextField
-                    hintText="Search"
-                    style={Styles.searchTextBox}
-                    />
-                <IconButton 
-                    iconClassName="material-icons" 
-                    >
-                    search
-                </IconButton>
-                <div style={Styles.searchResults}>
-                </div>
+                <Paper zDepth={this.props.resultsVisible ? 3 : 0} style={{paddingLeft: 5, position:'relative', display: 'flex', flex: 1}}>
+                    <TextField
+                        hintText="Search"
+                        style={Styles.searchTextBox}
+                        onKeyPress={(e: React.KeyboardEvent<TextField>) => this.onSearchKeyPress(e.key, e.target["value"])}
+                        value={this.state.searchTempText}
+                        />
+                    <IconButton 
+                        iconClassName="material-icons" 
+                        onClick={e => this.props.onResultsVisibityChanged(true)}
+                        >
+                        search
+                    </IconButton>
+                    <div style={combineStyles([Styles.searchResults, this.props.resultsVisible ? undefined : {display: 'none'}])}>
+                        Results
+                    </div>
+                </Paper>
             </div>
         );
     }

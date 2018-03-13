@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as MaterialUiStyles from 'material-ui/styles';
-import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
+// import * as MaterialUiStyles from 'material-ui/styles';
+// import IconButton from 'material-ui/IconButton';
+// import TextField from 'material-ui/TextField';
 
 import * as CitationUtils from '../../utils/CitationUtils';
 
@@ -13,16 +13,8 @@ namespace Styles {
         paddingBottom: 10,
         display: "flex",
     }
-    export const dragHandle:React.CSSProperties = {
-        backgroundImage: "radial-gradient(black 40%, transparent 40%)",
-        backgroundSize: "4px 4px",
-        backgroundPosition: "0 100%",
-        backgroundRepeat: "repeat-x",
-        cursor: "move"
-    }
-    export const childrenContainer:React.CSSProperties = {
-
-    }
+    export const header:React.CSSProperties = {}
+    export const temop:React.CSSProperties = {}
 }
 
 
@@ -35,8 +27,8 @@ const NonCitationView:React.StatelessComponent<{sentances:string[]}> = props =>
         <div style={Styles.header}>
             "God is Love"
         </div>
-        <div style={}>
-            <div style={}>
+        <div style={Styles.temop}>
+            <div style={Styles.temop}>
                 "Love" as a synonym for God - 63 results
             </div>
 

@@ -26,12 +26,24 @@ namespace Styles {
     }
 }
 
-export class App extends React.Component {
+interface State {
+    searchResultsVisible: boolean
+}
+
+export class App extends React.Component<{}, State> {
+    constructor(props:{}){
+        super(props);
+        this.state = {
+            searchResultsVisible: false
+        };
+    }
     render() {
         return (
             <div style={Styles.page}>
                 <div style={Styles.searchContainer}>
                     <Search
+                        resultsVisible={this.state.searchResultsVisible}
+                        onResultsVisibityChanged={value => {this.setState({searchResultsVisible:value})}}
                         />
                 </div>
                 <div style={Styles.workspaceContainer}>
