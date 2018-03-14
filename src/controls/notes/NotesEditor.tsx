@@ -7,8 +7,8 @@ namespace Styles {
         paddingLeft: 50,
         paddingRight: 50,
         paddingBottom: 10,
-        display: "flex",
-        flex: 1
+        flex: 1,
+        height: 'calc(100% - 20px)'
     }
     export const editor:React.CSSProperties = {
         flex: 1
