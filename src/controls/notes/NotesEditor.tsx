@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { Editor, EditorState, ContentState, SelectionState, ContentBlock } from 'draft-js';
+import { Editor, EditorState, DraftEditorCommand, DraftHandleValue, ContentState, SelectionState, ContentBlock, RichUtils, getDefaultKeyBinding } from 'draft-js';
+import {Toolbar, ToolbarGroup/*, ToolbarSeparator*/} from 'material-ui/Toolbar';
+import IconButton from 'material-ui/IconButton';
+
+
+type SyntheticKeyboardEvent = React.KeyboardEvent<{}>;
+type EditorCommand = DraftEditorCommand | string
 
 namespace Styles {
     export const control:React.CSSProperties = {
@@ -24,19 +30,81 @@ interface State {
     editorState: EditorState
 }
 
+const ToolbarButton:React.StatelessComponent<{icon:string, onClick:()=>void}> = props => 
+    <IconButton 
+        iconClassName="material-icons" 
+        onClick={e => props.onClick()}
+        >
+        {props.icon}
+    </IconButton>
+
 export class NotesEditor extends React.Component<Props, State> {
     constructor(props:Props) {
         super(props);
         this.state = { editorState: EditorState.createEmpty(), textSelections: [] };
     }
 
+    onChange = (editorState:EditorState) => {
+        this.setState({editorState});
+    }
+
+    toggleInlineStyle = (inlineStyle:string) => 
+    this.onChange(RichUtils.toggleInlineStyle(
+        this.state.editorState,
+        inlineStyle
+    ))
+
+    toggleBlockType = (blockType:string) => 
+    this.onChange(RichUtils.toggleBlockType(
+        this.state.editorState,
+        blockType
+    ))
+    
+    handleKeyCommand = (command: EditorCommand, editorState: EditorState): DraftHandleValue => {
+        console.log('hi')
+        const newState = RichUtils.handleKeyCommand(editorState, command);
+        if (newState) {
+            this.onChange(newState);
+            return "handled";
+        }
+        return "not-handled";
+    }
+
+    mapKeyToEditorCommand = (e: SyntheticKeyboardEvent): EditorCommand | null => {
+        if (e.keyCode === 9 /* TAB */) {
+            console.log('ho')
+            const newEditorState = RichUtils.onTab(
+                e,
+                this.state.editorState,
+                4, /* maxDepth */
+                );
+
+            if (newEditorState !== this.state.editorState) {
+                this.onChange(newEditorState);
+            }
+
+            return null;
+        }
+        return getDefaultKeyBinding(e);
+    }
+
     render() {
         return (
             <div style={Styles.control}>
+                <Toolbar>
+                    <ToolbarGroup>
+                        <ToolbarButton
+                            icon="format_bold"
+                            onClick={() => this.toggleInlineStyle('BOLD')}
+                            />
+                    </ToolbarGroup>
+                </Toolbar>
                 <Editor
                     editorState={this.state.editorState}
                     onChange={this.onEditorChange}
                     spellCheck={true}
+                    handleKeyCommand={this.handleKeyCommand}
+                    keyBindingFn={this.mapKeyToEditorCommand}
                     />
             </div>
         );
