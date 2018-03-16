@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Search } from './controls/search/Search';
 import { BookBrowser } from './controls/book-browser/BookBrowser';
 import { NotesEditor } from './controls/notes/NotesEditor';
+import { StudyBuddy } from './controls/study-buddy/StudyBuddy';
 
 namespace Styles {
     export const page:React.CSSProperties = {
@@ -27,14 +28,16 @@ namespace Styles {
 }
 
 interface State {
-    searchResultsVisible: boolean
+    searchResultsVisible: boolean,
+    selectedNotesText: string
 }
 
 export class App extends React.Component<{}, State> {
     constructor(props:{}){
         super(props);
         this.state = {
-            searchResultsVisible: false
+            searchResultsVisible: false,
+            selectedNotesText: ""
         };
     }
     render() {
@@ -50,12 +53,15 @@ export class App extends React.Component<{}, State> {
                     <div style={Styles.mainContainer}>
                         <BookBrowser
                             />
+                        {this.state.selectedNotesText && 
+                            <StudyBuddy
+                                subject={this.state.selectedNotesText}
+                                />
+                        }
                     </div>
                     <div style={Styles.noteListContainer}>
                         <NotesEditor
-                            onSelectionChanged={selection => {
-                                
-                            }}
+                            onSelectionChanged={selectedNotesText => this.setState({selectedNotesText})}
                             />
                     </div>
                 </div>

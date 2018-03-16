@@ -31,17 +31,24 @@ const NonCitationView:React.StatelessComponent<{sentances:string[]}> = props =>
             <div style={Styles.temop}>
                 "Love" as a synonym for God - 63 results
             </div>
-
+            <div style={Styles.temop}>
+                347 Articles on JSH Online
+            </div>
         </div>
     </div>
 
 const CitationView:React.StatelessComponent<{citations:string[]}> = props => 
     <div style={Styles.control}>
-        
+        {props.citations.map((citation, index) => 
+            <div style={Styles.header}>
+                {citation}
+            </div>
+        )}
     </div>
 
 export const StudyBuddy:React.StatelessComponent<Props> = props => {
     const citations = CitationUtils.getCitations(props.subject, false);
+    console.log(citations);
     if (citations.length) {
         return <CitationView citations={citations} />
     }

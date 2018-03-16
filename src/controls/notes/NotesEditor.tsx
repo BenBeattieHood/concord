@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Editor, EditorState, DraftEditorCommand, DraftHandleValue, ContentState, SelectionState, ContentBlock, RichUtils, getDefaultKeyBinding } from 'draft-js';
-import {Toolbar, ToolbarGroup/*, ToolbarSeparator*/} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup, ToolbarSeparator} from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 
 
@@ -61,7 +61,6 @@ export class NotesEditor extends React.Component<Props, State> {
     ))
     
     handleKeyCommand = (command: EditorCommand, editorState: EditorState): DraftHandleValue => {
-        console.log('hi')
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
             this.onChange(newState);
@@ -71,20 +70,37 @@ export class NotesEditor extends React.Component<Props, State> {
     }
 
     mapKeyToEditorCommand = (e: SyntheticKeyboardEvent): EditorCommand | null => {
-        if (e.keyCode === 9 /* TAB */) {
-            console.log('ho')
-            const newEditorState = RichUtils.onTab(
-                e,
-                this.state.editorState,
-                4, /* maxDepth */
-                );
+        const newEditorState = (():EditorState | null => {
+            switch (e.keyCode) {
+                case 9: // tab
+                    return RichUtils.onTab(
+                        e,
+                        this.state.editorState,
+                        4, /* maxDepth */
+                        );
 
+                case 86: // B
+                    if (e.ctrlKey) {
+                        return RichUtils.toggleInlineStyle(
+                            this.state.editorState,
+                            'bold'
+                        );
+                    }
+            }
+            return null;
+        })();
+
+        if (newEditorState) {
             if (newEditorState !== this.state.editorState) {
                 this.onChange(newEditorState);
             }
-
+            e.preventDefault();
             return null;
         }
+        else if (e.ctrlKey) {
+            console.log(`key:${e.keyCode} : ${e.shiftKey}`)
+        }
+
         return getDefaultKeyBinding(e);
     }
 
@@ -97,6 +113,15 @@ export class NotesEditor extends React.Component<Props, State> {
                             icon="format_bold"
                             onClick={() => this.toggleInlineStyle('BOLD')}
                             />
+                        <ToolbarSeparator/>
+                        <ToolbarButton
+                            icon="format_list_numbered"
+                            onClick={() => this.toggleBlockType('ordered-list-item')}
+                            />
+                        <ToolbarButton
+                            icon="format_list_bulleted"
+                            onClick={() => this.toggleBlockType('unordered-list-item')}
+                            />
                     </ToolbarGroup>
                 </Toolbar>
                 <Editor
@@ -105,6 +130,7 @@ export class NotesEditor extends React.Component<Props, State> {
                     spellCheck={true}
                     handleKeyCommand={this.handleKeyCommand}
                     keyBindingFn={this.mapKeyToEditorCommand}
+                    onTab={this.mapKeyToEditorCommand}
                     />
             </div>
         );
