@@ -123,6 +123,16 @@ export class NotesEditor extends React.Component<Props, State> {
                             onClick={() => this.toggleBlockType('unordered-list-item')}
                             />
                     </ToolbarGroup>
+                    <ToolbarGroup>
+                        <ToolbarButton
+                            icon="print"
+                            onClick={() => alert('open print popup')}
+                            />
+                        <ToolbarButton
+                            icon="share"
+                            onClick={() => alert('open share popup')}
+                            />
+                    </ToolbarGroup>
                 </Toolbar>
                 <Editor
                     editorState={this.state.editorState}

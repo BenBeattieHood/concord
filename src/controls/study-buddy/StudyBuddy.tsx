@@ -47,7 +47,7 @@ const CitationView:React.StatelessComponent<{citations:string[]}> = props =>
     </div>
 
 export const StudyBuddy:React.StatelessComponent<Props> = props => {
-    const citations = CitationUtils.getCitations(props.subject, false);
+    const citations = CitationUtils.getCitationRefs(props.subject, false);
     console.log(citations);
     if (citations.length) {
         return <CitationView citations={citations} />
