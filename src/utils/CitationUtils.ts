@@ -3,14 +3,17 @@ export interface Citation {
     text: string
 }
 
-type CollectionAbbrv =
-    "Bible"
-    | "S&H"
-    | "JSH"
-    | "Hymnal"
-    | "Man"
-    | "PW"
-
+const collections = {
+    "Bible": { title: "The Bible" },
+    "S&H": { title: "Science & Health" },
+    "JSH": { title: "JSH Online" },
+    "Hymnal": { title: "The Hymnal" },
+    "Man": { title: "Manual Of The Mother Church" },
+    "PW": { title: "Prose Works" },
+    "MBE Bios": { title: "Mary Baker Eddy Biographies" },
+}
+type CollectionAbbrv = keyof typeof collections
+    
 type ProseWorksBookAbbrv =
     "Mis"
     | "Ret"
@@ -27,51 +30,53 @@ type ProseWorksBookAbbrv =
     | "My"
     | "Po"
 
-type BibleBookAbbrv =
-    "Gen"
-    | "Ex"
-    | "Lev"
-    | "Num"
-    | "Deu"
-    | "Josh"
-    | "Jud"
-    | "Ruth"
-    | "Sam"
-    | "Kin"
-    | "Is"
-    | "Jer"
-    | "Ez"
-    | "Ps"
-    | "Pro"
-    | "Job"
-    | "Sol"
-    | "Lam"
-    | "Eccl"
-    | "Es"
-    | "Dan"
-    | "Ez"
-    | "Neh"
-    | "Chr"
-    | "Matt"
-    | "Mar"
-    | "Lu"
-    | "Jo"
-    | "Act"
-    | "Ro"
-    | "Cor"
-    | "Gal"
-    | "Eph"
-    | "Phil"
-    | "Col"
-    | "Thess"
-    | "Tim"
-    | "Tit"
-    | "Phil"
-    | "Heb"
-    | "Jam"
-    | "Pet"
-    | "Jud"
-    | "Rev"
+const bibleBooks = {
+    "Gen": { title: "Genesis" },
+    "Ex": { title: "Exodus" },
+    "Lev": { title: "Leviticus" },
+    "Num": { title: "Numbers" },
+    "Deu": { title: "Deuteronomy" },
+    "Josh": { title: "Joshua" },
+    "Jud": { title: "Judges" },
+    "Ruth": { title: "Ruth" },
+    "Sam": { title: "Samuel" },
+    "Kin": { title: "Kings" },
+    "Is": { title: "Isaiah" },
+    "Jer": { title: "Jeremiah" },
+    "Ez": { title: "Ezekiel" },
+    "Ps": { title: "Psalms" },
+    "Pro": { title: "Proverbs" },
+    "Job": { title: "Job" },
+    "Sol": { title: "Solomon" },
+    "Lam": { title: "Lamentations" },
+    "Eccl": { title: "Ecclesiastes" },
+    "Es": { title: "Esther" },
+    "Dan": { title: "Daniel" },
+    "Ezra": { title: "Ezra" },
+    "Neh": { title: "Nehemiah" },
+    "Chr": { title: "Chronicles" },
+    "Matt": { title: "Matthew" },
+    "Mar": { title: "Mark" },
+    "Lu": { title: "Luke" },
+    "Jo": { title: "John" },
+    "Act": { title: "Acts" },
+    "Ro": { title: "Romans" },
+    "Cor": { title: "Corinthians" },
+    "Gal": { title: "Galatians" },
+    "Eph": { title: "Ephesians" },
+    "Phil": { title: "Philippians" },
+    "Col": { title: "Colossians" },
+    "Thess": { title: "Thessalonians" },
+    "Tim": { title: "Timothy" },
+    "Tit": { title: "Titus" },
+    "Phile": { title: "Philemon" },
+    "Heb": { title: "Hebrews" },
+    "Jam": { title: "James" },
+    "Pet": { title: "Peter" },
+    "Jude": { title: "Jude" },
+    "Rev": { title: "Revelation" },
+}
+type BibleBookAbbrv = keyof typeof bibleBooks
     
 type BookAbbrv =
     BibleBookAbbrv
@@ -83,87 +88,52 @@ type BookAbbrv =
     | "Her"
     | "Hy"
 
-export const getCollectionName = (collection:CollectionAbbrv):string => {
-    switch (collection) {
-        case "Bible": return "The Bible";
-        case "S&H": return "Science & Health";
-        case "JSH": return "JSH Online";
-        case "Hymnal": return "The Hymnal";
-        case "Man": return "Manual Of The Mother Church";
-        case "PW": return "Prose Works";
-    }
+const peelBooks = {
+    "Peel:YOD": { title: "Mary Baker Eddy: Years of Discovery" },
+    "Peel:YOT": { title: "Mary Baker Eddy: Years of Trial" },
+    "Peel:YOA": { title: "Mary Baker Eddy: Years of Authority" },
 }
 
-export const getBookName = (book: BookAbbrv):string => {
-    switch (book) {
-        case "S&H": return "Science & Health";
-        case "Man": return "Manual Of The Mother Church";
-        case "Jou": return "The Journal";
-        case "Sen": return "The Sentinel";
-        case "Her": return "The Herald";
-        case "Hy": return "The Hymnal";
+function keys<T>(x:T):{keyof T}[]
 
-        case "Mis": return "Miscellaneous Writings";
-        case "Ret": return "Retrospection & Introspection";
-        case "Un": return "Unity of Good";
-        case "Pul": return "Pulpit & Press";
-        case "Rud": return "Rudimental Divine Science";
-        case "No": return "No & Yes";
-        case "Pan": return "Christian Science versus Pantheism";
-        case "’00": return "Message To The Mother Church, 1900";
-        case "’01": return "Message To The Mother Church, 1901";
-        case "’02": return "Message To The Mother Church, 1902";
-        case "Hea": return "Christian Healing";
-        case "Peo": return "The People's Idea Of God";
-        case "My": return "Miscellany";
-        case "Po": return "Poems";
+type PeelBookAbbrv = keyof typeof peelBooks
 
-        case "Gen": return "Genesis";
-        case "Ex": return "Exodus";
-        case "Lev": return "Leviticus";
-        case "Num": return "Numbers";
-        case "Deu": return "Deuteronomy";
-        case "Josh": return "Joshua";
-        case "Jud": return "Judges";
-        case "Ruth": return "Ruth";
-        case "Sam": return "Samuel";
-        case "Kin": return "Kings";
-        case "Is": return "Isaiah";
-        case "Jer": return "Jeremiah";
-        case "Ez": return "Ezekiel";
-        case "Ps": return "Psalms";
-        case "Pro": return "Proverbs";
-        case "Job": return "Job";
-        case "Sol": return "Solomon";
-        case "Lam": return "Lamentations";
-        case "Eccl": return "Ecclesiastes";
-        case "Es": return "Esther";
-        case "Dan": return "Daniel";
-        case "Ez": return "Ezra";
-        case "Neh": return "Nehemiah";
-        case "Chr": return "Chronicles";
-        case "Matt": return "Matthew";
-        case "Mar": return "Mark";
-        case "Lu": return "Luke";
-        case "Jo": return "John";
-        case "Act": return "Acts";
-        case "Ro": return "Romans";
-        case "Cor": return "Corinthians";
-        case "Gal": return "Galatians";
-        case "Eph": return "Ephesians";
-        case "Phil": return "Philippians";
-        case "Col": return "Colossians";
-        case "Thess": return "Thessalonians";
-        case "Tim": return "Timothy";
-        case "Tit": return "Titus";
-        case "Phil": return "Philemon";
-        case "Heb": return "Hebrews";
-        case "Jam": return "James";
-        case "Pet": return "Peter";
-        case "Jud": return "Jude";
-        case "Rev": return "Revelation";
-    }
+const PaywalledBooks:BookAbbrv[] = [
+    ...Object.keys(peelBooks)
+]
+const asd = PaywalledBooks
+
+const proseWorkBooks = {
+    "Mis": { title: "Miscellaneous Writings" },
+    "Ret": { title: "Retrospection & Introspection" },
+    "Un": { title: "Unity of Good" },
+    "Pul": { title: "Pulpit & Press" },
+    "Rud": { title: "Rudimental Divine Science" },
+    "No": { title: "No & Yes" },
+    "Pan": { title: "Christian Science versus Pantheism" },
+    "’00": { title: "Message To The Mother Church, 1900" },
+    "’01": { title: "Message To The Mother Church, 1901" },
+    "’02": { title: "Message To The Mother Church, 1902" },
+    "Hea": { title: "Christian Healing" },
+    "Peo": { title: "The People's Idea Of God" },
+    "My": { title: "Miscellany" },
+    "Po": { title: "Poems" }
 }
+const books = {
+    "S&H": { title: "Science & Health" },
+    "Man": { title: "Manual Of The Mother Church" },
+    "Jou": { title: "The Journal" },
+    "Sen": { title: "The Sentinel" },
+    "Her": { title: "The Herald" },
+    "Hy": { title: "The Hymnal" },
+
+    ...proseWorkBooks,
+
+    ...bibleBooks,
+    
+    "WKMBE": { title: "We Knew Mary Baker Eddy" },
+};
+type BookAbbrv = keyof typeof books
 
 export interface CitationRef {
     collection: CollectionAbbrv
