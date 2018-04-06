@@ -163,7 +163,8 @@ function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIterator<
 interface CitationRefFinder {
     (s:string):{position: number, citationRef: CitationRef, debugData: {citationAndLineRef:string, bookRef:string}}[]
 }
-function* getCitationRefFinders(collection: KeyValuePair<CollectionKey, Collection>, bookRefData:BookRefData): IterableIterator<{getCitationRefs:CitationRefFinder, book:BookAbbrv}> {
+function* getCitationRefFinders(collectionKey: CollectionKey, bookRefData:BookRefData): IterableIterator<{getCitationRefs:CitationRefFinder, book:BookAbbrv}> {
+    const collection = { key: collectionKey, value: collections[collectionKey] };
     for (const key of Object.keys(bookRefData)) {
         const book = bookRefData[key];
 
@@ -207,7 +208,8 @@ function* getCitationRefFinders(collection: KeyValuePair<CollectionKey, Collecti
         yield { getCitationRefs, book };
     }
 }
-const bibleBookRegexes = getCitationRefRegExps(bibleBooks);
+const bibleBookRegexes = getCitationRefFinders("Bible", bibleBooks);
+const proseWorkBookRegexes = getCitationRefFinders("Bible", proseWorkBooks);
 
 export const getCitationRefs = (input:string, short:boolean):CitationRef[] => {
     const citations = input.match(/([0-9]*[ \t]*((Gen(esis)?)|(Ex(odus)?)|(Lev(iticus)?)|(Num(bers)?)|(Deu(t(eronomy)?)?)|(Josh(ua)?)|(Jud(ges)?)|(Ruth)|(Sam(uel)?)|(Kings)|(Is(aiah)?)|(Jer(emiah)?)|(Ez(ekiel)?)|(Ps(alms)?)|(Pro(verbs)?)|(Job)|(Sol(omon)?)|(Lam(entations)?)|(Eccl(esiastes)?)|(Es(ther)?)|(Dan(iel)?)|(Ez(ra)?)|(Neh(emiah)?)|(Chr(on(icles)?)?)|(Matt(hew)?)|(Mar(k)?)|Lu(ke)?|(Jo(hn)?)|(Act(s)?)|(Ro(mans)?)|(Cor(inthians)?)|(Gal(atians)?)|(Eph(esians)?)|(Phil(ippians)?)|(Col(ossians)?)|(Thess(alonians)?)|(Tim(othy)?)|(Tit(us)?)|(Phil(emon)?)|(Heb(rews)?)|(Jam(es)?)|(Pet(er)?)|(Jud(e)?)|(Rev(elation)?)|(S&?H)|(Sci(ence (and|&) Health)))[ \t]*([0-9\:\- \t,;]*))\b/gi);
