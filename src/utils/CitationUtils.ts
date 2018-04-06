@@ -1,9 +1,20 @@
+interface KeyValuePair<K, V> {
+    key: K
+    value: V
+}
+export interface CitationRef {
+    collection: KeyValuePair<CollectionKey, Collection>
+    book: KeyValuePair<BookKey, Book>
+    lineRef: string
+}
 export interface Citation {
     ref: CitationRef,
     text: string
 }
 
-interface BookRefData {[key:string]: { title: string, altAbbrs: string[], altTitles: string[] }}
+interface Collection { title: string }
+interface Book { title: string, altAbbrs: string[], altTitles: string[], translation: string }
+interface BookRefData {[key:string]: Book}
 
 const collections = {
     "Bible": { title: "The Bible" },
@@ -14,7 +25,7 @@ const collections = {
     "PW": { title: "Prose Works" },
     "MBE Bios": { title: "Mary Baker Eddy Biographies" },
 }
-type CollectionAbbrv = keyof typeof collections
+type CollectionKey = keyof typeof collections
     
 
 const bibleBooks:BookRefData = 
@@ -88,14 +99,14 @@ const bibleBooks:BookRefData =
     "Zech": { title: "Zechariah", altAbbrs: [], altTitles: [] },
     "Zeph": { title: "Zephaniah", altAbbrs: [], altTitles: [] },
 }
-type BibleBookAbbrv = keyof typeof bibleBooks
+type BibleBookKey = keyof typeof bibleBooks
     
 const peelBooks = {
     "Peel:YOD": { title: "Mary Baker Eddy: Years of Discovery", altAbbrs: [], altTitles: [] },
     "Peel:YOT": { title: "Mary Baker Eddy: Years of Trial", altAbbrs: [], altTitles: [] },
     "Peel:YOA": { title: "Mary Baker Eddy: Years of Authority", altAbbrs: [], altTitles: [] },
 }
-type PeelBookAbbrv = keyof typeof peelBooks
+type PeelBookKey = keyof typeof peelBooks
 
 const proseWorkBooks = {
     "Mis": { title: "Miscellaneous Writings", altAbbrs: [], altTitles: [] },
@@ -113,7 +124,7 @@ const proseWorkBooks = {
     "My": { title: "Miscellany", altAbbrs: [], altTitles: [ "The First Church of Christ, Scientist, and Miscellany" ] },
     "Po": { title: "Poems", altAbbrs: [], altTitles: [] },
 }
-type ProseWorksBookAbbrv = keyof typeof proseWorkBooks
+type ProseWorksBookKey = keyof typeof proseWorkBooks
 
 const books = {
     "S&H": { title: "Science and Health", altAbbrs: [ "S and H" ], altTitles: [ "Science and Health with Key to the Scriptures" ] },
@@ -132,19 +143,13 @@ const books = {
     
     "WKMBE": { title: "We Knew Mary Baker Eddy", altAbbrs: [], altTitles: [] },
 };
-type BookAbbrv = keyof typeof books
+type BookKey = keyof typeof books
 
 const paywalledBooks = [
     ...Object.keys(peelBooks)
-].map(s => s as BookAbbrv)
+].map(s => s as BookKey)
 
 
-export interface CitationRef {
-    collection: CollectionAbbrv
-    translation: string
-    book: BookAbbrv
-    lineRef: string
-}
 
 function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIterator<B> {
     for (const value of values) {
@@ -155,20 +160,51 @@ function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIterator<
     }
 }
 
-function* getCitationRefRegExps(bookRefData:BookRefData): IterableIterator<{regExp:RegExp, book:BookAbbrv}> {
+interface CitationRefFinder {
+    (s:string):{position: number, citationRef: CitationRef, debugData: {citationAndLineRef:string, bookRef:string}}[]
+}
+function* getCitationRefFinders(collection: KeyValuePair<CollectionKey, Collection>, bookRefData:BookRefData): IterableIterator<{getCitationRefs:CitationRefFinder, book:BookAbbrv}> {
     for (const key of Object.keys(bookRefData)) {
         const book = bookRefData[key];
-        const bookNumberMatches = key.match(/^[1-9]+? /g);
-        const regExpPrefix = 
-            bookNumberMatches
-            ? `[^0-9]`
-            : 
-            const regExp = new RegExp(`[^0-9](${key})\w*`, "i");
+
+        const identifiers = [key, book.title, ...book.altAbbrs]
+        const identifierRegExpStr = identifiers.map(identifier => {
+            const bookNumberMatches = identifier.match(/^[1-9]+? /g);
+            const regExpPrefix = 
+                bookNumberMatches
+                ? `[^0-9I]`
+                : `[^a-zA-Z]`;
+
+            return `(^|${regExpPrefix})(${identifier})`;
+        }).join(`)|(`)
+
+        const citationMatchRegExpStr = `((${identifierRegExpStr}))\\s*([0-9;\\-\\s:]*)`
+        const globalRegExp = new RegExp(citationMatchRegExpStr, "ig")
+        const regExp = new RegExp(citationMatchRegExpStr, "i");
+        
+        const getCitationRefs:CitationRefFinder = s => {
+            const globalRegExpMatches = s.match(globalRegExp);
+            if (globalRegExpMatches) {
+                return globalRegExpMatches.map(citationAndLineRef => {
+                    const regExpParts = citationAndLineRef.match(regExp)!;
+                    const regExpMatches = regExpParts.filter(x => x);
+                    const debugData = { citationAndLineRef, bookRef: regExpMatches[regExpMatches.length - 2] };
+                    const lineRef = regExpParts[regExpParts.length - 1]; 
+                    return {
+                        debugData,
+                        position: regExpParts.index!,
+                        citationRef: {
+                            collection,
+                            book: { key: key as BookKey, value: book },
+                            lineRef
+                        }
+                    }
+                });
+            }
+            return [];
         }
-        else 
-        {
-            const regExp = new RegExp(`[^a-zA-Z]${key}[^a-zA-Z]`, "i");
-        }
+
+        yield { getCitationRefs, book };
     }
 }
 const bibleBookRegexes = getCitationRefRegExps(bibleBooks);
