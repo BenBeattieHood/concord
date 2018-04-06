@@ -3,6 +3,8 @@ export interface Citation {
     text: string
 }
 
+interface BookRefData {[key:string]: { title: string, altAbbrs: string[], altTitles: string[] }}
+
 const collections = {
     "Bible": { title: "The Bible" },
     "S&H": { title: "Science & Health" },
@@ -14,126 +16,128 @@ const collections = {
 }
 type CollectionAbbrv = keyof typeof collections
     
-type ProseWorksBookAbbrv =
-    "Mis"
-    | "Ret"
-    | "Un"
-    | "Pul"
-    | "Rud"
-    | "No"
-    | "Pan"
-    | "’00"
-    | "’01"
-    | "’02"
-    | "Hea"
-    | "Peo"
-    | "My"
-    | "Po"
 
-const bibleBooks = {
-    "Gen": { title: "Genesis" },
-    "Ex": { title: "Exodus" },
-    "Lev": { title: "Leviticus" },
-    "Num": { title: "Numbers" },
-    "Deu": { title: "Deuteronomy" },
-    "Josh": { title: "Joshua" },
-    "Jud": { title: "Judges" },
-    "Ruth": { title: "Ruth" },
-    "Sam": { title: "Samuel" },
-    "Kin": { title: "Kings" },
-    "Is": { title: "Isaiah" },
-    "Jer": { title: "Jeremiah" },
-    "Ez": { title: "Ezekiel" },
-    "Ps": { title: "Psalms" },
-    "Pro": { title: "Proverbs" },
-    "Job": { title: "Job" },
-    "Sol": { title: "Solomon" },
-    "Lam": { title: "Lamentations" },
-    "Eccl": { title: "Ecclesiastes" },
-    "Es": { title: "Esther" },
-    "Dan": { title: "Daniel" },
-    "Ezra": { title: "Ezra" },
-    "Neh": { title: "Nehemiah" },
-    "Chr": { title: "Chronicles" },
-    "Matt": { title: "Matthew" },
-    "Mar": { title: "Mark" },
-    "Lu": { title: "Luke" },
-    "Jo": { title: "John" },
-    "Act": { title: "Acts" },
-    "Ro": { title: "Romans" },
-    "Cor": { title: "Corinthians" },
-    "Gal": { title: "Galatians" },
-    "Eph": { title: "Ephesians" },
-    "Phil": { title: "Philippians" },
-    "Col": { title: "Colossians" },
-    "Thess": { title: "Thessalonians" },
-    "Tim": { title: "Timothy" },
-    "Tit": { title: "Titus" },
-    "Phile": { title: "Philemon" },
-    "Heb": { title: "Hebrews" },
-    "Jam": { title: "James" },
-    "Pet": { title: "Peter" },
-    "Jude": { title: "Jude" },
-    "Rev": { title: "Revelation" },
+const bibleBooks:BookRefData = 
+{
+    "Acts": { title: "The Acts", altAbbrs: [], altTitles: [ "Acts of the Apostles" ] },
+    "Bel & Dr": { title: "Bel and the Dragon", altAbbrs: [], altTitles: [ "Daniel 14 (when considered canonical)" ] },
+    "1 Chr": { title: "1 Chronicles", altAbbrs: [ "I Chr", "1 Chron", "I Chron" ], altTitles: [ "the First book of Chronicles" ] },
+    "2 Chr": { title: "2 Chronicles", altAbbrs: [ "II Chr", "2 Chron", "II Chron" ], altTitles: [ "the Second book of Chronicles" ] },
+    "Col": { title: "Colossians", altAbbrs: [ "Coloss" ], altTitles: [ "the Epistle of Paul the Apostle to the Colossians" ] },
+    "1 Cor": { title: "1 Corinthians", altAbbrs: [], altTitles: [ "the First epistle of Paul the Apostle to the Corinthians" ] },
+    "2 Cor": { title: "2 Corinthians", altAbbrs: [], altTitles: [ "the Second epistle of Paul the Apostle to the Corinthians" ] },
+    "Dan": { title: "Daniel", altAbbrs: [], altTitles: [] },
+    "Deut": { title: "Deuteronomy", altAbbrs: [], altTitles: [ "the Fifth book of Moses" ] },
+    "Eccl": { title: "Ecclesiastes", altAbbrs: [ "Ecc", "Eccles" ], altTitles: [ "the Preacher" ] },
+    "Ecclus": { title: "Ecclesiasticus", altAbbrs: [], altTitles: [ "the Wisdom of Jesus son of Sirach, Ben Sira, Sirach" ] },
+    "Eph": { title: "Ephesians", altAbbrs: [ "Ephes" ], altTitles: [ "the Epistle of Paul the Apostle to the Ephesians" ] },
+    "Esd": { title: "Esdras", altAbbrs: [], altTitles: [] },
+    "1 Esd": { title: "1 Esdras", altAbbrs: [ "I Esd" ], altTitles: [] },
+    "2 Esd": { title: "2 Esdras", altAbbrs: [ "II Esd" ], altTitles: [] },
+    "3 Esd": { title: "3 Esdras", altAbbrs: [ "III Esd" ], altTitles: [] },
+    "4 Esd": { title: "4 Esdras", altAbbrs: [ "IV Esd" ], altTitles: [] },
+    "Exod": { title: "Exodus", altAbbrs: [], altTitles: [ "the Second book of Moses" ] },
+    "Ezek": { title: "Ezekiel", altAbbrs: [], altTitles: [ "the Book of the Prophet Ezekiel" ] },
+    "Gal": { title: "Galatians", altAbbrs: [], altTitles: [ "the Epistle of Paul the Apostle to the Galatians" ] },
+    "Gen": { title: "Genesis", altAbbrs: [], altTitles: [ "the First book of Moses" ] },
+    "Hab": { title: "Habakkuk", altAbbrs: [], altTitles: [] },
+    "Hag": { title: "Haggai", altAbbrs: [], altTitles: [] },
+    "Heb": { title: "Hebrews", altAbbrs: [ "Hebr" ], altTitles: [ "the Epistle of Paul the Apostle to the Hebrews" ] },
+    "Hos": { title: "Hosea", altAbbrs: [], altTitles: [] },
+    "Isa": { title: "Isaiah", altAbbrs: [], altTitles: [ "the Book of the Prophet Isaiah" ] },
+    "Jam": { title: "James", altAbbrs: [ "Jas" ], altTitles: [ "the General epistle of James" ] },
+    "Jer": { title: "Jeremiah", altAbbrs: [], altTitles: [ "the Book of the Prophet Jeremiah" ] },
+    "Josh": { title: "Joshua", altAbbrs: [], altTitles: [] },
+    "Jude": { title: "Jude", altAbbrs: [], altTitles: [] },
+    "Jud": { title: "Judges", altAbbrs: [ "Judg" ], altTitles: [] },
+    "Judi": { title: "Judith", altAbbrs: [], altTitles: [] },
+    "1 Kin": { title: "1 Kings", altAbbrs: [ "I Kin", "1 Kgs", "I Kgs" ], altTitles: [ "the First book of the Kings", "the Third book of the Kings (when 1 & 2 Sam. are named 1 & 2 Kgs" ] },
+    "2 Kin": { title: "2 Kings", altAbbrs: [ "II Kin", "2 Kgs", "II Kgs" ], altTitles: [ "the Second book of the Kings", "the Fourth book of the Kings (when 1 & 2 Sam. are named 1 & 2 Kgs" ] },
+    "Lam": { title: "Lamentations", altAbbrs: [ "Lament" ], altTitles: [ "the Lamentations of Jeremiah" ] },
+    "Lev": { title: "Leviticus", altAbbrs: [], altTitles: [ "the Third book of Moses" ] },
+    "1 Macc": { title: "1 Maccabees", altAbbrs: [ "I Macc" ], altTitles: [] },
+    "2 Macc": { title: "2 Maccabees", altAbbrs: [ "II Macc" ], altTitles: [] },
+    "Mal": { title: "Malachi", altAbbrs: [], altTitles: [] },
+    "Matt": { title: "Matthew", altAbbrs: [], altTitles: [ "the Gospel of St Matthew" ] },
+    "Mic": { title: "Micah", altAbbrs: [], altTitles: [] },
+    "Nah": { title: "Nahum", altAbbrs: [], altTitles: [] },
+    "Neh": { title: "Nehemiah", altAbbrs: [], altTitles: [] },
+    "Num": { title: "Numbers", altAbbrs: [], altTitles: [ "the Fourth book of Moses" ] },
+    "Obad": { title: "Obadiah", altAbbrs: [], altTitles: [] },
+    "1 Pet": { title: "1 Peter", altAbbrs: [ "I Pet" ], altTitles: [ "the First epistle general of Peter" ] },
+    "2 Pet": { title: "2 Peter", altAbbrs: [ "II Pet" ], altTitles: [ "the Second epistle general of Peter" ] },
+    "Philem": { title: "Philemon", altAbbrs: [], altTitles: [ "the Epistle of Paul to Philemon" ] },
+    "Phil": { title: "Philippians", altAbbrs: [ "Philipp" ], altTitles: [ "the Epistle of Paul the Apostle to the Philippians" ] },
+    "Pr. of Man": { title: "Prayer of Manasseh", altAbbrs: [], altTitles: [] },
+    "Prov": { title: "Proverbs", altAbbrs: [ "Pro" ], altTitles: [] },
+    "Ps": { title: "Psalms", altAbbrs: [ "Pss" ], altTitles: [] },
+    "Rev": { title: "Revelation", altAbbrs: [], altTitles: [ "the Revelation of St John the Divine" ] },
+    "Rom": { title: "Romans", altAbbrs: [], altTitles: [ "the Epistle of Paul the Apostle to the Romans" ] },
+    "S. of III Ch": { title: "Song of the Three Holy Children", altAbbrs: [], altTitles: [] },
+    "Sam": { title: "Samuel", altAbbrs: [], altTitles: [] },
+    "1 Sam": { title: "1 Samuel", altAbbrs: [ "I Sam" ], altTitles: [ "the First book of Samuel", "the First book of Kings" ] },
+    "2 Sam": { title: "2 Samuel", altAbbrs: [ "II Sam" ], altTitles: [ "the Second book of Samuel", "the Second book of Kings" ] },
+    "Sol": { title: "Song of Solomon", altAbbrs: [ "S. of Sol", "Song", "Song of Sol", "Song Sol", "Cant" ], altTitles: ["Song of Solomon", "Canticles", "Canticle of Canticles", "Song of Songs" ] },
+    "Sus": { title: "Susanna", altAbbrs: [], altTitles: [ "Daniel 13 (when considered canonical)" ] },
+    "1 Thess": { title: "1 Thessalonians", altAbbrs: [ "I Thess" ], altTitles: [ "the First epistle of Paul the Apostle to the Thessalonians" ] },
+    "2 Thess": { title: "2 Thessalonians", altAbbrs: [ "II Thess" ], altTitles: [ "the Second epistle of Paul the Apostle to the Thessalonians" ] },
+    "1 Tim": { title: "1 Timothy", altAbbrs: [ "I Tim" ], altTitles: [ "the First epistle of Paul the Apostle to the Timothy" ] },
+    "2 Tim": { title: "2 Timothy", altAbbrs: [ "II Tim" ], altTitles: [ "the Second epistle of Paul the Apostle to the Timothy" ] },
+    "Tit": { title: "Titus", altAbbrs: [], altTitles: [ "the Epistle of Paul to Titus" ] },
+    "Wisd": { title: "Wisdom of Solomon", altAbbrs: [], altTitles: [ "Wisdom" ] },
+    "Zech": { title: "Zechariah", altAbbrs: [], altTitles: [] },
+    "Zeph": { title: "Zephaniah", altAbbrs: [], altTitles: [] },
 }
 type BibleBookAbbrv = keyof typeof bibleBooks
     
-type BookAbbrv =
-    BibleBookAbbrv
-    | ProseWorksBookAbbrv
-    | "S&H"
-    | "Man"
-    | "Jou"
-    | "Sen"
-    | "Her"
-    | "Hy"
-
 const peelBooks = {
-    "Peel:YOD": { title: "Mary Baker Eddy: Years of Discovery" },
-    "Peel:YOT": { title: "Mary Baker Eddy: Years of Trial" },
-    "Peel:YOA": { title: "Mary Baker Eddy: Years of Authority" },
+    "Peel:YOD": { title: "Mary Baker Eddy: Years of Discovery", altAbbrs: [], altTitles: [] },
+    "Peel:YOT": { title: "Mary Baker Eddy: Years of Trial", altAbbrs: [], altTitles: [] },
+    "Peel:YOA": { title: "Mary Baker Eddy: Years of Authority", altAbbrs: [], altTitles: [] },
 }
-
-function keys<T>(x:T):{keyof T}[]
-
 type PeelBookAbbrv = keyof typeof peelBooks
 
-const PaywalledBooks:BookAbbrv[] = [
-    ...Object.keys(peelBooks)
-]
-const asd = PaywalledBooks
-
 const proseWorkBooks = {
-    "Mis": { title: "Miscellaneous Writings" },
-    "Ret": { title: "Retrospection & Introspection" },
-    "Un": { title: "Unity of Good" },
-    "Pul": { title: "Pulpit & Press" },
-    "Rud": { title: "Rudimental Divine Science" },
-    "No": { title: "No & Yes" },
-    "Pan": { title: "Christian Science versus Pantheism" },
-    "’00": { title: "Message To The Mother Church, 1900" },
-    "’01": { title: "Message To The Mother Church, 1901" },
-    "’02": { title: "Message To The Mother Church, 1902" },
-    "Hea": { title: "Christian Healing" },
-    "Peo": { title: "The People's Idea Of God" },
-    "My": { title: "Miscellany" },
-    "Po": { title: "Poems" }
+    "Mis": { title: "Miscellaneous Writings", altAbbrs: [], altTitles: [] },
+    "Ret": { title: "Retrospection & Introspection", altAbbrs: [], altTitles: [] },
+    "Un": { title: "Unity of Good", altAbbrs: [], altTitles: [] },
+    "Pul": { title: "Pulpit & Press", altAbbrs: [], altTitles: [] },
+    "Rud": { title: "Rudimental Divine Science", altAbbrs: [], altTitles: [] },
+    "No": { title: "No & Yes", altAbbrs: [], altTitles: [] },
+    "Pan": { title: "Christian Science vs Pantheism", altAbbrs: [], altTitles: [ "Christian Science versus Pantheism" ] },
+    "’00": { title: "Message 1900", altAbbrs: [], altTitles: [ "Message To The Mother Church, 1900" ] },
+    "’01": { title: "Message 1901", altAbbrs: [], altTitles: [ "Message To The Mother Church, 1901" ] },
+    "’02": { title: "Message 1902", altAbbrs: [], altTitles: [ "Message To The Mother Church, 1902" ] },
+    "Hea": { title: "Christian Healing", altAbbrs: [], altTitles: [] },
+    "Peo": { title: "The People's Idea Of God", altAbbrs: [], altTitles: [] },
+    "My": { title: "Miscellany", altAbbrs: [], altTitles: [ "The First Church of Christ, Scientist, and Miscellany" ] },
+    "Po": { title: "Poems", altAbbrs: [], altTitles: [] },
 }
+type ProseWorksBookAbbrv = keyof typeof proseWorkBooks
+
 const books = {
-    "S&H": { title: "Science & Health" },
+    "S&H": { title: "Science and Health", altAbbrs: [ "S and H" ], altTitles: [ "Science and Health with Key to the Scriptures" ] },
     "Man": { title: "Manual Of The Mother Church" },
-    "Jou": { title: "The Journal" },
-    "Sen": { title: "The Sentinel" },
-    "Her": { title: "The Herald" },
-    "Hy": { title: "The Hymnal" },
+    "Jou": { title: "The Journal", altAbbrs: [], altTitles: [ "The Christian Science Journal" ] },
+    "Sen": { title: "The Sentinel", altAbbrs: [], altTitles: [ "The Christian Science Sentinel" ] },
+    "Her": { title: "The Herald", altAbbrs: [], altTitles: [ "The Christian Science Herald" ] },
+    "Chr": { title: "Christ & Christmas", altAbbrs: [], altTitles: [] },
+    "Hy": { title: "The Hymnal", altAbbrs: [], altTitles: [ "The Christian Science Hymnal" ] },
 
     ...proseWorkBooks,
 
+    ...peelBooks,
+
     ...bibleBooks,
     
-    "WKMBE": { title: "We Knew Mary Baker Eddy" },
+    "WKMBE": { title: "We Knew Mary Baker Eddy", altAbbrs: [], altTitles: [] },
 };
 type BookAbbrv = keyof typeof books
+
+const paywalledBooks = [
+    ...Object.keys(peelBooks)
+].map(s => s as BookAbbrv)
+
 
 export interface CitationRef {
     collection: CollectionAbbrv
@@ -151,57 +155,20 @@ function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIterator<
     }
 }
 
-interface BookRefData {[key:string]: string[]}
-const bibleBooks:BookRefData = 
-{
-    "Genesis": [ ],
-    "Exodus": [ "Ex" ],
-    "Leviticus": [ ],
-    "Numbers": [ ],
-    "Deuteronomy": [ "Deut" ],
-    "Joshua": [ "Josh" ],
-    "Judges": [ "Judg" ],
-    "Ruth": [ "Ruth" ],
-    "Samuel": [ ],
-    "Kings": [ ],
-    "Isaiah": [ "Is" ],
-    "Jeremiah": [ ],
-    "Ezekiel": [ "Ez" ],
-    "Psalms": [ "Ps" ],
-    "Proverbs": [ ],
-    "Job": [ ],
-    "Song of Solomon": [ "Sol" ],
-    "Lamentations": [ ],
-    "Ecclesiastes": [ "Eccl" ],
-    "Esther": [ "Es" ],
-    "Daniel": [ ],
-    "Ezra": [ "Ez" ],
-    "Nehemiah": [ ],
-    "Chronicles": [ ],
-    "Matthew": [ "Matt" ],
-    "Mark": [ ],
-    "Luke": [ "Lu" ],
-    "John": [ "Jo" ],
-    "The Acts": [ "Act", "Acts" ],
-    "Romans": [ "Rom", "Ro" ],
-    "Corinthians": [ ],
-    "Galatians": [ ],
-    "Ephesians": [ ],
-    "Philippians": [],
-    "Colossians": [ ],
-    "Thessalonians": [ ],
-    "Timothy": [ ],
-    "Titus": [ ],
-    "Philemon": [ "Phil" ],
-    "Hebrews": [ ],
-    "James": [ ],
-    "Peter": [ ],
-    "Jude": [ ],
-    "Revelation": [ ]
-}
-const getCitationRefRegExps = (bookRefData:BookRefData): {regEx:RegExp, book:BookAbbrv}[] => {
-    for (const asd of Object.keys(bookRefData)) {
-
+function* getCitationRefRegExps(bookRefData:BookRefData): IterableIterator<{regExp:RegExp, book:BookAbbrv}> {
+    for (const key of Object.keys(bookRefData)) {
+        const book = bookRefData[key];
+        const bookNumberMatches = key.match(/^[1-9]+? /g);
+        const regExpPrefix = 
+            bookNumberMatches
+            ? `[^0-9]`
+            : 
+            const regExp = new RegExp(`[^0-9](${key})\w*`, "i");
+        }
+        else 
+        {
+            const regExp = new RegExp(`[^a-zA-Z]${key}[^a-zA-Z]`, "i");
+        }
     }
 }
 const bibleBookRegexes = getCitationRefRegExps(bibleBooks);
