@@ -17,20 +17,6 @@ interface Collection { title: string }
 interface Book { title: string, altAbbrs: string[], altTitles: string[], order?: number }
 interface BookRefData {[key:string]: Book}
 
-const collections = {
-    "Bible": { title: "The Bible" },
-    "S&H": { title: "Science & Health" },
-    "JSH": { title: "JSH Online" },
-    "Hymnal": { title: "The Hymnal" },
-    "Man": { title: "Manual Of The Mother Church" },
-    "PW": { title: "Prose Works" },
-    "MBE Bios": { title: "Mary Baker Eddy Biographies" },
-    "Uncollected": { title: "" }
-}
-type CollectionKey = keyof typeof collections
-const UncollectedCollectionKey:CollectionKey = "Uncollected"
-    
-
 const bibleBooks:BookRefData = 
 {
     "Acts": { title: "The Acts", altAbbrs: [], altTitles: [ "Acts of the Apostles" ], order: 44},
@@ -162,22 +148,11 @@ const books = {
     ...bibleBooks,
     
 };
-type BookKey = keyof typeof books
+export type BookKey = keyof typeof books
 
-const paywalledBooks = [
+export const paywalledBooks = [
     ...Object.keys(peelBooks)
 ].map(s => s as BookKey)
-
-
-
-function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIterator<B> {
-    for (const value of values) {
-        const result = f(value);
-        if (result !== undefined) {
-            yield result;
-        }
-    }
-}
 
 interface CitationRefFinder {
     (s:string):{position: number, citationRef: CitationRef, debugData: {citationAndLineRef:string, bookRef:string}}[]
@@ -187,7 +162,7 @@ function* getCitationRefFinders(args:{
     defaultTranslation: string, 
     altTranslations: string[], 
     bookRefData:BookRefData
-}): IterableIterator<{getCitationRefs:CitationRefFinder, book:BookAbbrv}> {
+}): IterableIterator<{getCitationRefs:CitationRefFinder, book:Book}> {
     const availableTranslationsSet = new Set([args.defaultTranslation, ...args.altTranslations].map(x => x.toUpperCase()));
     const availableTranslations = Array.from(availableTranslationsSet);
     const collection = { key: args.collectionKey, value: collections[args.collectionKey] };
@@ -260,6 +235,21 @@ const uncollectedCitationRefFinders = getCitationRefFinders({
     altTranslations: [ ],
     bookRefData: { ...uncollectedBooks, ...jshBooks }
 });
+
+
+const collections = {
+    "Bible": { title: "The Bible", books:  },
+    "S&H": { title: "Science & Health" },
+    "JSH": { title: "JSH Online" },
+    "Hymnal": { title: "The Hymnal" },
+    "Man": { title: "Manual Of The Mother Church" },
+    "PW": { title: "Prose Works" },
+    "MBE Bios": { title: "Mary Baker Eddy Biographies" },
+    "Uncollected": { title: "" }
+}
+type CollectionKey = keyof typeof collections
+const UncollectedCollectionKey:CollectionKey = "Uncollected"
+
 
 export const bookCitationRefFinders = [
     ...Array.from(bibleCitationRefFinders),
