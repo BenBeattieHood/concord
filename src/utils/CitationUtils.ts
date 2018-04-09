@@ -15,7 +15,14 @@ export interface Citation {
     text: string
 }
 
-export interface Collection { title: string }
+export interface Collection { 
+    title: string,
+    bookGroups: {
+        defaultTranslation: string,
+        altTranslations: string[],
+        bookRefData: BookRefData
+    }[]
+}
 export interface Book { title: string, altAbbrs: string[], altTitles: string[], order?: number }
 export interface BookRefData {[key:string]: Book}
 
@@ -213,71 +220,66 @@ function* getCitationRefFinders(args:{
         yield { getCitationRefs, book };
     }
 }
-const bibleCitationRefFinders = getCitationRefFinders({
-    collectionKey: "Bible", 
-    defaultTranslation: "KJV",
-    altTranslations: [ "AMP", "CEV", "MSG", "YLT" ],
-    bookRefData: bibleBooks
-});
-const proseWorkCitationRefFinders = getCitationRefFinders({
-    collectionKey: "PW", 
-    defaultTranslation: "ENG",
-    altTranslations: [ "FR" ],
-    bookRefData: proseWorkBooks
-});
-const jshBookCitationRefFinders = getCitationRefFinders({
-    collectionKey: "JSH", 
-    defaultTranslation: "ENG",
-    altTranslations: [ ],
-    bookRefData: jshBooks
-});
-const uncollectedCitationRefFinders = getCitationRefFinders({
-    collectionKey: "Uncollected", 
-    defaultTranslation: "ENG",
-    altTranslations: [ ],
-    bookRefData: { ...uncollectedBooks, ...jshBooks }
-});
 
 
 const collections:{ [key:string]: Collection } = {
     "Bible": { 
-        title: "The Bible", 
-        defaultTranslation: "KJV",
-        altTranslations: [ "AMP", "CEV", "MSG", "YLT" ],
-        bookRefData: bibleBooks
+        title: "The Bible",
+        bookGroups: [{
+            defaultTranslation: "KJV",
+            altTranslations: [ "AMP", "CEV", "MSG", "YLT" ],
+            bookRefData: bibleBooks
+        }]
     },
     "JSH": { 
         title: "JSH Online",
-        defaultTranslation: "ENG",
-        altTranslations: [ ],
-        bookRefData: jshBooks
+        bookGroups: [{
+            defaultTranslation: "ENG",
+            altTranslations: [ ],
+            bookRefData: jshBooks
+        }]
     },
-    "Hymnal": { title: "The Hymnal" },
-    "Man": { title: "Manual Of The Mother Church" },
     "PW": { 
-        title: "Prose Works", 
-        defaultTranslation: "ENG",
-        altTranslations: [ "FR" ],
-        bookRefData: proseWorkBooks
+        title: "Prose Works",
+        bookGroups: [{
+            defaultTranslation: "ENG",
+            altTranslations: [ "FR" ],
+            bookRefData: proseWorkBooks
+        }]
     },
-    "MBE Bios": { title: "Mary Baker Eddy Biographies" },
+    "MBE Bios": { 
+        title: "Mary Baker Eddy Biographies",
+        bookGroups: [{
+            defaultTranslation: "ENG",
+            altTranslations: [ ],
+            bookRefData: bioBooks
+        }]
+    },
     "Uncollected": { 
         title: "",
-        defaultTranslation: "ENG",
-        altTranslations: [ ],
-        bookRefData: uncollectedBooks
+        bookGroups: [{
+            defaultTranslation: "ENG",
+            altTranslations: [ ],
+            bookRefData: uncollectedBooks
+        }]
     }
 }
 export type CollectionKey = keyof typeof collections
 const UncollectedCollectionKey:CollectionKey = "Uncollected"
 
+const bookCitationRefFinders = 
+    ArrayM.flatten(Object.keys(collections)
+    .map(collectionKey => {
+        const collection = collections[collectionKey];
+        
+        return ArrayM.flatten(collection.bookGroups.map(bookGroup =>
+            Array.from(getCitationRefFinders({
+                ...bookGroup,
+                collectionKey
+            }))
+        ));
+    }));
 
-const bookCitationRefFinders = [
-    ...Array.from(bibleCitationRefFinders),
-    ...Array.from(proseWorkCitationRefFinders),
-    ...Array.from(jshBookCitationRefFinders),
-    ...Array.from(uncollectedCitationRefFinders)
-]
 export type GetCitationRefsResult = { position: number, citationRef: CitationRef }[]
 export const getCitationRefs = (s: string):GetCitationRefsResult => 
     ArrayM.flatten(Array.from(ArrayM.choose(bookCitationRefFinders, x => x.getCitationRefs(s))));

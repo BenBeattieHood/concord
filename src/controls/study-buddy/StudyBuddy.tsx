@@ -43,14 +43,11 @@ const CitationView:React.StatelessComponent<{booksAndCitationRefs:GetCitationRef
         {props.booksAndCitationRefs.map((bookAndCitationRefs, bookIndex) => 
             <div key={bookIndex}>
                 <div style={Styles.header}>
-                    {bookAndCitationRefs.book}
+                    {bookAndCitationRefs.citationRef.book.value}
                 </div>
                 <div>
-                    {bookAndCitationRefs.citationRefs.map((citationRef, index) => 
-                        <div style={Styles.result}>
-                            {citationRef.citationRef.}
-                        </div>
-                    )}
+                    <b>{bookAndCitationRefs.citationRef.collection.value.title}</b>
+                    <span>{bookAndCitationRefs.citationRef.lineRef}</span>
                 </div>
             </div>
         )}
