@@ -2,8 +2,9 @@ import * as React from 'react';
 // import * as MaterialUiStyles from 'material-ui/styles';
 // import IconButton from 'material-ui/IconButton';
 // import TextField from 'material-ui/TextField';
+import * as ArrayM from '../../utils/ArrayUtils';
 
-import * as CitationUtils from '../../utils/CitationUtils';
+import { getCitationRefs, Collection, CollectionKey, Book, BookKey, CitationRef, Citation, GetCitationRefsResult } from '../../utils/CitationUtils';
 
 namespace Styles {
     export const control:React.CSSProperties = {
@@ -37,20 +38,28 @@ const NonCitationView:React.StatelessComponent<{sentances:string[]}> = props =>
         </div>
     </div>
 
-const CitationView:React.StatelessComponent<{citations:string[]}> = props => 
+const CitationView:React.StatelessComponent<{booksAndCitationRefs:GetCitationRefsResult}> = props => 
     <div style={Styles.control}>
-        {props.citations.map((citation, index) => 
-            <div style={Styles.header}>
-                {citation}
+        {props.booksAndCitationRefs.map((bookAndCitationRefs, bookIndex) => 
+            <div key={bookIndex}>
+                <div style={Styles.header}>
+                    {bookAndCitationRefs.book}
+                </div>
+                <div>
+                    {bookAndCitationRefs.citationRefs.map((citationRef, index) => 
+                        <div style={Styles.result}>
+                            {citationRef.citationRef.}
+                        </div>
+                    )}
+                </div>
             </div>
         )}
     </div>
 
 export const StudyBuddy:React.StatelessComponent<Props> = props => {
-    const citations = CitationUtils.bookCitationRefFinders..getCitationRefs(props.subject, false);
-    console.log(citations);
-    if (citations.length) {
-        return <CitationView citations={citations} />
+    const booksAndCitationRefs = getCitationRefs(props.subject);
+    if (booksAndCitationRefs.length) {
+        return <CitationView booksAndCitationRefs={booksAndCitationRefs} />
     }
     else {
         const sentances = props.subject.replace(/\.|\r/gi, "\n").split("\n").filter(x => x && x.trim().length)

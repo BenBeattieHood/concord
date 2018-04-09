@@ -6,3 +6,6 @@ export function* choose<A, B>(values:A[], f:(value:A)=>(B|undefined)):IterableIt
         }
     }
 }
+export function flatten<T>(input: T[][]):T[] {
+    return Array.prototype.concat.apply([], input);
+}

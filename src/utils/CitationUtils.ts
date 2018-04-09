@@ -1,3 +1,5 @@
+import * as ArrayM from './ArrayUtils';
+
 interface KeyValuePair<K, V> {
     key: K
     value: V
@@ -13,9 +15,9 @@ export interface Citation {
     text: string
 }
 
-interface Collection { title: string }
-interface Book { title: string, altAbbrs: string[], altTitles: string[], order?: number }
-interface BookRefData {[key:string]: Book}
+export interface Collection { title: string }
+export interface Book { title: string, altAbbrs: string[], altTitles: string[], order?: number }
+export interface BookRefData {[key:string]: Book}
 
 const bibleBooks:BookRefData = 
 {
@@ -237,23 +239,45 @@ const uncollectedCitationRefFinders = getCitationRefFinders({
 });
 
 
-const collections = {
-    "Bible": { title: "The Bible", books:  },
-    "S&H": { title: "Science & Health" },
-    "JSH": { title: "JSH Online" },
+const collections:{ [key:string]: Collection } = {
+    "Bible": { 
+        title: "The Bible", 
+        defaultTranslation: "KJV",
+        altTranslations: [ "AMP", "CEV", "MSG", "YLT" ],
+        bookRefData: bibleBooks
+    },
+    "JSH": { 
+        title: "JSH Online",
+        defaultTranslation: "ENG",
+        altTranslations: [ ],
+        bookRefData: jshBooks
+    },
     "Hymnal": { title: "The Hymnal" },
     "Man": { title: "Manual Of The Mother Church" },
-    "PW": { title: "Prose Works" },
+    "PW": { 
+        title: "Prose Works", 
+        defaultTranslation: "ENG",
+        altTranslations: [ "FR" ],
+        bookRefData: proseWorkBooks
+    },
     "MBE Bios": { title: "Mary Baker Eddy Biographies" },
-    "Uncollected": { title: "" }
+    "Uncollected": { 
+        title: "",
+        defaultTranslation: "ENG",
+        altTranslations: [ ],
+        bookRefData: uncollectedBooks
+    }
 }
-type CollectionKey = keyof typeof collections
+export type CollectionKey = keyof typeof collections
 const UncollectedCollectionKey:CollectionKey = "Uncollected"
 
 
-export const bookCitationRefFinders = [
+const bookCitationRefFinders = [
     ...Array.from(bibleCitationRefFinders),
     ...Array.from(proseWorkCitationRefFinders),
     ...Array.from(jshBookCitationRefFinders),
     ...Array.from(uncollectedCitationRefFinders)
 ]
+export type GetCitationRefsResult = { position: number, citationRef: CitationRef }[]
+export const getCitationRefs = (s: string):GetCitationRefsResult => 
+    ArrayM.flatten(Array.from(ArrayM.choose(bookCitationRefFinders, x => x.getCitationRefs(s))));
