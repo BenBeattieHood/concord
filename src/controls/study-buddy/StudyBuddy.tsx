@@ -4,7 +4,7 @@ import * as React from 'react';
 // import TextField from 'material-ui/TextField';
 import * as ArrayM from '../../utils/ArrayUtils';
 
-import { getCitationRefs, Collection, CollectionKey, Book, BookKey, CitationRef, Citation, GetCitationRefsResult } from '../../utils/CitationUtils';
+import { getCitationRefs, Collection, CollectionKey, Book, BookKey, CitationRefGroup, Citation, GetCitationRefsResult } from '../../utils/CitationUtils';
 
 namespace Styles {
     export const control:React.CSSProperties = {

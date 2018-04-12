@@ -10,7 +10,8 @@ import DropDownMenu from 'material-ui/DropDownMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import Toggle from 'material-ui/Toggle';
-import { Citation, CitationRef } from '../../utils/CitationUtils';
+import { Citation, CitationRefGroup, Collection, CollectionKey, Book, BookKey, collections, UncollectedCollectionKey, collectionsWithBooksAndTranslations } from '../../utils/CitationUtils';
+import * as ArrayM from '../../utils/ArrayUtils';
 
 const muiTheme = MaterialUiStyles.getMuiTheme();
 namespace Styles {
@@ -35,70 +36,89 @@ export class BookBrowser extends React.Component {
 }
 
 interface BookBrowserToolbarProps {
-    citationRef: CitationRef
-    onChangeCitationRef: (citationRef:CitationRef)=>void
-}
-
-const getTranslations = (args:{collection : "Bible" | "Science and Health" | "JSH Online"}) : string[] | undefined => {
-    switch (args.collection) {
-        case "Bible": return [];
-        case "Science and Health": return undefined;
-        case "JSH Online": return undefined;
-
-        default:
-            const _:never = args.collection;
-    }
-}
-
-const getBooks = (args:{collection : "Bible" | "Science and Health" | "JSH Online", translation: string}) : string[] | undefined => {
-    switch (args.collection) {
-        case "Bible": return [];
-        case "Science and Health": return undefined;
-        case "JSH Online": return ["Journal", "Sentinel", "Herald"];
-
-        default:
-            const _:never = args.collection;
-    }
-}
-
-const getChapters = (args:{collection : "Bible" | "Science and Health" | "JSH Online", translation: string, book: string}) : number[] | undefined => {
-    const createChapterArray = (max:number) => [...Array(max)].map((_, index) => index);
-    switch (args.collection) {
-        case "Bible": return [];
-        case "Science and Health": return createChapterArray(12);
-        case "JSH Online": return [1,2,3];
-
-        default:
-            const _:never = args.collection;
-    }
+    citationRef: CitationRefGroup
+    onChangeCitationRef: (citationRef:CitationRefGroup)=>void
 }
 
 const getChapter = (lineRef:string):number => 1
 
+const onChangeCitationRef = (
+    props: {
+        citationRef: CitationRefGroup
+        onChangeCitationRef: (citationRef:CitationRefGroup)=>void
+    }, 
+    citationRef: Partial<CitationRefGroup>
+):void => 
+{
+    const collection = citationRef.collection || props.citationRef.collection;
+    let book = citationRef.book || props.citationRef.book;
+    if (collection.value.bookGroups.map(bookGroup => Object.keys(bookGroup).map(key => bookGroup[])))
+}
+
 const BookBrowserToolbar:React.StatelessComponent<BookBrowserToolbarProps> = (props) => {
-    const translations = getTranslations({collection:props.citationRef.collection});
-    const books = getBooks({collection: props.citationRef.collection, translation: props.citationRef.translation});
+    const bookGroups = collections[props.citationRef.collection.key].bookGroups;
+
+    const translations =
+        ArrayM.uniq(ArrayM.flatten(bookGroups.map(bookGroup => 
+            [ bookGroup.defaultTranslation, ...bookGroup.altTranslations ]
+        ))).sort();
+
+    const books =
+        ArrayM.uniq(ArrayM.flatten(bookGroups.map(bookGroup => {
+            const bookGroupKeys = Object.keys(bookGroup.bookRefData);
+            return bookGroupKeys
+                .map((bookKey, index) => {
+                    const book = bookGroup.bookRefData[bookKey];
+                    return {
+                        order: (book.order ? (book.order + bookGroupKeys.length) : index),
+                        bookKey,
+                        book
+                    }
+                })  
+        }))
+        .sort(x => x.order)
+        .map(x => ({ bookKey: x.bookKey, book: x.book })));
+    
+    const booksAndTranslations = collectionsWithBooksAndTranslations[props.citationRef.collection.key];
+
+    const booksForTheCurrentTranslation = booksAndTranslations.booksToTranslations[props.citationRef.translation];
+    const translationsForTheCurrentBook = booksAndTranslations.booksToTranslations[props.citationRef.book.key];
+
     const chapter = getChapter(props.citationRef.lineRef);
     const chapters = getChapters({collection: props.citationRef.collection, translation: props.citationRef.translation, book: props.citationRef.book});
+    const getMenuItemSelectedStyle = (isSelected: boolean): React.CSSProperties | undefined =>
+        isSelected
+        ? { opacity: 0.8 }
+        : undefined;
+
     return (
         <Toolbar>
             <ToolbarGroup firstChild={true}>
-                <DropDownMenu value={props.citationRef.collection} onChange={(e, i, value) => props.onChangeCitationRef({collection:value, translation: props.citationRef.translation, book:props.citationRef.book, lineRef:props.citationRef.lineRef})}>
-                    {["Bible", "Science and Health", "JSH Online"].map((value, index) => 
-                        <MenuItem value={value} primaryText={value} />
+                <DropDownMenu value={props.citationRef.collection.key} onChange={(e, i, value) => 
+                    onChangeCitationRef(props, {
+                        collection: value
+                    })}>
+                    {Object.keys(collections).map(collectionKey => 
+                        <MenuItem value={collectionKey} primaryText={collections[collectionKey].title} />
                     )}
                 </DropDownMenu>
-                {translations == null ? null :
-                    <DropDownMenu value={props.citationRef.translation} onChange={(e, i, value) => props.onChangeCitationRef({collection:props.citationRef.collection, translation: value, book:props.citationRef.book, lineRef:props.citationRef.lineRef})}>
-                        {translations.map((value, index) => 
-                            <MenuItem value={value} primaryText={value} />
+                {translations.length === 1 ? null :
+                    <DropDownMenu value={props.citationRef.translation} onChange={(e, i, value) => 
+                        onChangeCitationRef(props, {
+                            translation: value
+                        })}>
+                        {translations.map(translation => 
+                            <MenuItem value={translation} primaryText={translation} style={getMenuItemSelectedStyle(translationsForTheCurrentBook[translation] !== undefined)} />
                         )}
                     </DropDownMenu>
                 }
-                {books == null ? null :
-                    <DropDownMenu value={props.citationRef.book} onChange={(e, i, value) => props.onChangeCitationRef({collection:props.citationRef.collection, translation: props.citationRef.translation, book:value, lineRef:props.citationRef.lineRef})}>
+                {props.citationRef.collection.key === UncollectedCollectionKey ? null :
+                    <DropDownMenu value={props.citationRef.book} onChange={(e, i, value) => 
+                        onChangeCitationRef(props, {
+                            book: value, 
+                        })}>
                         {books.map((value, index) => 
-                            <MenuItem value={value} primaryText={value} />
+                            <MenuItem value={value} primaryText={value.book.title} style={getMenuItemSelectedStyle(booksForTheCurrentTranslation[value.bookKey] !== undefined)} />
                         )}
                     </DropDownMenu>
                 }

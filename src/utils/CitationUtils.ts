@@ -164,7 +164,7 @@ export const paywalledBooks = [
 ].map(s => s as BookKey)
 
 interface CitationRefFinder {
-    (s:string):{position: number, citationRef: CitationRef, debugData: {citationAndLineRef:string, bookRef:string}}[]
+    (s:string):{position: number, citationRefs: CitationRef[], debugData: {citationAndLineRef:string, bookRef:string}}[]
 }
 function* getCitationRefFinders(args:{
     collectionKey: CollectionKey, 
@@ -201,7 +201,9 @@ function* getCitationRefFinders(args:{
                     const regExpMatches = regExpParts.filter(x => x);   // strip 'undefined's
                     const translations = regExpMatches.filter(x => availableTranslationsSet.has(x.toUpperCase())); // find any possible translations
                     const debugData = { citationAndLineRef, bookRef: regExpMatches[regExpMatches.length - 2] };
-                    const lineRef = regExpParts[regExpParts.length - 1]; 
+                    const lineRefRaw = regExpParts[regExpParts.length - 1];
+                    // todo: split up the lineRefRaw into parts, taking into account spaces
+                    const lineRefs = lineRefRaw.split(';')
                     return {
                         debugData,
                         position: regExpParts.index!,
@@ -222,7 +224,7 @@ function* getCitationRefFinders(args:{
 }
 
 
-const collections:{ [key:string]: Collection } = {
+export const collections:{ [key:string]: Collection } = {
     "Bible": { 
         title: "The Bible",
         bookGroups: [{
@@ -264,8 +266,56 @@ const collections:{ [key:string]: Collection } = {
         }]
     }
 }
+export const collectionsWithBooksAndTranslations = 
+    Object.keys(collections)
+    .reduce((result, collectionKey) => {
+        const collection = collections[collectionKey];
+        const booksAndTranslations = 
+            ArrayM.flatten(
+                collection.bookGroups.map((bookGroup, bookGroupIndex) => 
+                    Object.keys(bookGroup.bookRefData)
+                    .map(bookKey => ({
+                        bookKey,
+                        bookGroupIndex,
+                        translations: [ bookGroup.defaultTranslation, ...bookGroup.altTranslations ]
+                    }))
+                )
+            );
+
+        const { booksToTranslations, translationsToBooks } = 
+            booksAndTranslations
+            .reduce(
+                ({booksToTranslations, translationsToBooks}, next) => {
+                    const translations = booksToTranslations[next.bookKey] = booksToTranslations[next.bookKey] || {};
+                    next.translations.forEach(nextTranslation => {
+                        (translations[nextTranslation] = translations[nextTranslation] || []).push(next.bookGroupIndex);
+                        const translationToBooks = (translationsToBooks[nextTranslation] = translationsToBooks[nextTranslation] || {});
+                        (translationToBooks[next.bookKey] = translationToBooks[next.bookKey] || []).push(next.bookGroupIndex);
+                    });
+                    return {booksToTranslations, translationsToBooks};
+                },
+                {
+                    booksToTranslations: {} as {[bookKey:string]: {[translation: string]: number[]}},
+                    translationsToBooks: {} as {[translation:string]: {[bookKey: string]: number[]}}
+                }
+            );
+
+        result[collectionKey] = {
+            collection,
+            booksToTranslations,
+            translationsToBooks 
+        };
+
+        return result;
+    },
+    {} as {[collectionKey:string]: {
+        collection:Collection, 
+        booksToTranslations: {[bookKey:string]: {[translation: string]: number[]}},
+        translationsToBooks: {[translation:string]: {[bookKey: string]: number[]}}
+    }}
+);
 export type CollectionKey = keyof typeof collections
-const UncollectedCollectionKey:CollectionKey = "Uncollected"
+export const UncollectedCollectionKey:CollectionKey = "Uncollected"
 
 const bookCitationRefFinders = 
     ArrayM.flatten(Object.keys(collections)
@@ -280,6 +330,6 @@ const bookCitationRefFinders =
         ));
     }));
 
-export type GetCitationRefsResult = { position: number, citationRef: CitationRef }[]
+export type GetCitationRefsResult = { position: number, citationRef: CitationRefGroup }[]
 export const getCitationRefs = (s: string):GetCitationRefsResult => 
     ArrayM.flatten(Array.from(ArrayM.choose(bookCitationRefFinders, x => x.getCitationRefs(s))));
