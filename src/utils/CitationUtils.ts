@@ -26,6 +26,7 @@ export interface Collection {
 export interface Book { title: string, altAbbrs: string[], altTitles: string[], order?: number }
 export interface BookRefData {[key:string]: Book}
 
+// https://en.wikipedia.org/wiki/Chapters_and_verses_of_the_Bible
 const bibleBooks:BookRefData = 
 {
     "Acts": { title: "The Acts", altAbbrs: [], altTitles: [ "Acts of the Apostles" ], order: 44},
